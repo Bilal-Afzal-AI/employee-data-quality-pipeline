@@ -1,0 +1,61 @@
+services:
+
+  postgres:
+    image: postgres:13
+    container_name: dq_postgres
+
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: employee_dq
+
+    ports:
+      - "5432:5432"
+
+  airflow:
+    image: apache/airflow:2.7.3
+    container_name: airflow
+
+    depends_on:
+      - postgres
+
+    environment:
+      AIRFLOW__CORE__EXECUTOR: SequentialExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://postgres:postgres@dq_postgres:5432/employee_dq
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+
+    ports:
+      - "8080:8080"
+
+    volumes:
+      - C:/Users/HP/EmployeeDataQuality/dags:/opt/airflow/dags
+
+    command: >
+      bash -c "
+      airflow db init &&
+      airflow users create
+      --username airflow
+      --password airflow
+      --firstname admin
+      --lastname user
+      --role Admin
+      --email admin@example.com || true &&
+      airflow scheduler &
+      airflow webserver
+      "
+
+  mlflow:
+    image: ghcr.io/mlflow/mlflow
+    container_name: mlflow
+
+    ports:
+      - "5000:5000"
+
+    command: mlflow ui --host 0.0.0.0 --port 5000
+
+  superset:
+    image: apache/superset
+    container_name: superset
+
+    ports:
+      - "8088:8088"

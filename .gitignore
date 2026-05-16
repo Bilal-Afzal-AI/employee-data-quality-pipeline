@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.pyc
+venv/
+.env
+
+# Airflow / Docker volumes / logs
+logs/
+airflow/logs/
+airflow_env/
+superset_env/
+
+# Local data
+*.db
+*.sqlite
+mlflow_data/
+superset_home/
+postgres_data/
+
+# OS / IDE
+.vscode/
+.DS_Store
